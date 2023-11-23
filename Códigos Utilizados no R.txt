@@ -1,0 +1,36 @@
+library(dplyr)
+library(ggplot2)
+
+# Lê o arquivo CSV usando ponto e vírgula como separador
+tabela_nascidos_2021 <- read.csv2("Nascidos_2021.csv", nrows = 1000)
+
+# Visualiza os primeiros registros
+head(tabela_nascidos_2021)
+
+# Histograma da idade da mãe
+hist(tabela_nascidos_2021$IDADEMAE, main = 'Distribuição da Idade da Mãe', xlab = 'Idade', ylab = 'Frequência')
+
+
+# Verificar se é uma distribuição normal.
+shapiro.test(tabela_nascidos_2021$IDADEMAE)
+
+# Calcule a média do peso para cada idade da mãe
+media_peso_por_idade <- tabela_nascidos_2021 %>%
+  group_by(IDADEMAE) %>%
+  summarise(MEDIA_PESO = mean(PESO, na.rm = TRUE))
+
+# Crie um gráfico de dispersão
+ggplot(media_peso_por_idade, aes(x = IDADEMAE, y = MEDIA_PESO)) +
+  geom_point() +
+  labs(title = "Relação entre Idade da Mãe e Peso Médio dos Recém-Nascidos",
+       x = "Idade da Mãe",
+       y = "Peso Médio dos Recém-Nascidos") +
+  theme_minimal()
+
+# Teste de Correlação de Pearson
+cor_test <- cor.test(tabela_nascidos_2021$IDADEMAE, tabela_nascidos_2021$PESO, method = "pearson")
+print(cor_test)
+
+# Teste de Correlação de Spearman
+cor_test_spearman <- cor.test(tabela_nascidos_2021$IDADEMAE, tabela_nascidos_2021$PESO, method = "spearman")
+print(cor_test_spearman)
